@@ -1,5 +1,6 @@
 import numpy as np 
 import cv2
+import os
 
 from visual_odometry import PinholeCamera, VisualOdometry
 
@@ -15,10 +16,12 @@ for img_id in range(4541):
 	vo.update(img, img_id)
 
 	cur_t = vo.cur_t
-	if(img_id > 2):
+
+	if img_id > 2:
 		x, y, z = cur_t[0], cur_t[1], cur_t[2]
 	else:
 		x, y, z = 0., 0., 0.
+
 	draw_x, draw_y = int(x)+290, int(z)+90
 	true_x, true_y = int(vo.trueX)+290, int(vo.trueZ)+90
 
@@ -27,9 +30,12 @@ for img_id in range(4541):
 	cv2.rectangle(traj, (10, 20), (600, 60), (0,0,0), -1)
 	text = "Coordinates: x=%2fm y=%2fm z=%2fm"%(x,y,z)
 	cv2.putText(traj, text, (20,40), cv2.FONT_HERSHEY_PLAIN, 1, (255,255,255), 1, 8)
+	path = '/home/wjpark/Github/monoVO/output'
 
-	cv2.imshow('Road facing camera', img)
-	cv2.imshow('Trajectory', traj)
-	cv2.waitKey(0)
+	if img_id % 10 == 0:
+		cv2.imwrite(os.path.join(path, 'Road facing camera_', str(img_id), '_.jpg'), img)
+		cv2.imwrite(os.path.join(path, 'Trajectory_', str(img_id), '_.jpg'), traj)
 
-cv2.imwrite('map.png', traj)
+		print("img_id :", img_id)
+
+cv2.imwrite('/home/wjpark/Github/monoVO/map.png', traj)
